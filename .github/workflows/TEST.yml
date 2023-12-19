@@ -2,8 +2,7 @@ name: Jenkins Test Instance Pipeline Trigger
 
 on:
   push:
-    branches:
-      - test  
+        branches: [ "test" ]
 jobs:
   trigger-jenkins-pipeline:
     runs-on: ubuntu-latest
