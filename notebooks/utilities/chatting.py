@@ -21,7 +21,7 @@ def __get_string_prompt(instruction, system_prompt):
     return prompt_template
 
 
-def get_template_prompt():
+def get_template_prompt(qa=False):
     """
     Function to get a template prompt for the conversation.
 
@@ -33,12 +33,17 @@ def get_template_prompt():
     and not have any text after the answer is done. Do not mention in the answer, that is taken from the given context 
 
     If a question appears nonsensical or lacks factual coherence, kindly explain the issue"""
-    instruction = """CHAT HISTORY:
-    {chat_history}
-    Question: {question}"""
+    
+    if not qa:
+        instruction = """CHAT HISTORY:\n\n{chat_history} \nQuestion: {question}"""
+        input_variables = ["chat_history", "question"]
+    else:
+        instruction = """Question: {question}"""
+        input_variables = ["question"]
+        
     llama_2_prompt = PromptTemplate(
         template=__get_string_prompt(instruction, sys_prompt),
-        input_variables=["chat_history", "question"],
+        input_variables=input_variables,
         validate_template=False
     )
     
