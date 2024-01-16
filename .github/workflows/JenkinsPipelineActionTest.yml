@@ -8,15 +8,15 @@ on:
 
 jobs:
   trigger-jenkins-pipeline:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Get Jenkins Crumb
         id: get-crumb
         run: |
-          CRUMB=$(curl -u palrag:${{ secrets.CSRF_GITHUB_JENKINS_TOKEN }} http://54.89.32.115:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb))
+          CRUMB=$(curl -s -u palrag:${{ secrets.CSRF_GITHUB_JENKINS_TOKEN }} http://54.89.32.115:8080/crumbIssuer/api/xml | tr -d '\n' | sed 's/.*<crumb>\(.*\)<\/crumb>.*/\1/')
           echo "::set-output name=crumb::$CRUMB"
 
       - name: Trigger Jenkins Pipeline
         run: |
-          curl -X POST -H "${{ steps.get-crumb.outputs.crumb }}" "http://54.89.32.115:8080/job/PalragDeployPipeline/build"
+          curl -X POST -H "Jenkins-Crumb:${{ steps.get-crumb.outputs.crumb }}" "http://54.89.32.115:8080/job/PalragDeployPipeline/build"
