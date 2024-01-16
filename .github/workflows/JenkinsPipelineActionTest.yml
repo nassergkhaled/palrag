@@ -13,4 +13,5 @@ jobs:
     steps:
       - name: Trigger Jenkins Pipeline
         run: |
+          curl -X POST "http://54.89.32.115:8080/job/PalragDeployPipeline/build"
           echo "Jenkins build triggered"
