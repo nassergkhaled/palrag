@@ -11,7 +11,5 @@ jobs:
 
     steps:
       - name: Trigger Jenkins Pipeline
-        env:
-          JENKINS_WEBHOOK_SECRET: ${{ secrets.JENKINS_WEBHOOK_SECRET }}
         run: |
           
