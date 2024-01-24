@@ -1,5 +1,5 @@
 fastapi
 uvicorn
 langchain
-chromadb
 sentence-transformers
+chromadb == 0.4.21

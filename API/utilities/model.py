@@ -8,6 +8,10 @@ from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from dotenv import dotenv_values
 
 
+import os
+os.environ['TRANSFORMERS_CACHE'] = './cache'
+os.environ['SENTENCE_TRANSFORMERS_HOME'] = './cache'
+
 env = dotenv_values()
 
 
@@ -29,8 +33,8 @@ def get_retriever(persist_directory="victorstore/chroma_db", k: int=2, score_thr
     return db.as_retriever(search_type="similarity_score_threshold",
                            search_kwargs={
                                'k': k,
-                               'score_threshold': score_threshold,
-                               'lambda_mult': lambda_mult
+                               'score_threshold': score_threshold
+                            #    'lambda_mult': lambda_mult
                            })
 
 
@@ -92,7 +96,7 @@ def get_model():
         max_tokens=256,
         top_k=50,
         top_p=0.9,
-        together_api_key=env['TOGETHER_API_KEY']
+        together_api_key=${{secrets.CSRF_GITHUB_JENKINS_TOKE}}
     )
     chat_history_13b = ConversationBufferWindowMemory(k=6, memory_key='chat_history')
     Llama2chat_13b_chain_Window = ConversationalRetrievalChain.from_llm(Llama_2_chat_13b,
