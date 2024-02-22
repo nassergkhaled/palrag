@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
                     // Build Docker image
-                    sh 'docker build -t palrag .'
+                    sh 'docker build -t palrag -f API/Dockerfile .'
                 }
             }
         }
