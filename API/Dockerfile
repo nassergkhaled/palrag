@@ -1,20 +1,20 @@
 # syntax=docker/dockerfile:1
 
+# Use Python 3.10 slim as the base image
 ARG PYTHON_VERSION=3.10
 FROM python:${PYTHON_VERSION}-slim as base
 
+# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Set working directory inside the container
 WORKDIR /app
 
 # Create a virtual environment
 RUN python -m venv /venv
 
-# Set the virtual environment as the active environment
-ENV PATH="/venv/bin:$PATH"
-
-# Create a non-privileged user that the app will run under
+# Add a non-privileged user to run the application
 ARG UID=10001
 RUN mkdir -p /home/appuser && \
     adduser \
@@ -42,5 +42,5 @@ COPY . .
 # Expose the port that the application listens on
 EXPOSE 8000
 
-# Run the application
+# Command to run the application
 CMD ["/venv/bin/python", "-m", "uvicorn", "app:app", "--host=0.0.0.0", "--port=8000"]
