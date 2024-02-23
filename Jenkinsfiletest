@@ -31,9 +31,17 @@ pipeline {
             steps {
                 script {
                     // Clean up unused Docker resources
-                    sh 'docker volume prune -f'
-                    sh 'docker image prune -f'
-                    sh 'docker container prune -f'
+                    // sh 'docker volume prune -f'
+                    // sh 'docker image prune -f'
+                    // sh 'docker container prune -f'
+                }
+            }
+        }
+
+        stage('Save Docker Image to Tar') {
+            steps {
+                script {
+                    sh 'docker save palrag -o palrag.tar'
                 }
             }
         }
@@ -41,15 +49,12 @@ pipeline {
         stage('Deploy to Remote AWS EC2') {
             steps {
                 script {
-                    // Save Docker image to a tar file
-                    sh 'docker save palrag -o palrag.tar'
-
                     // Copy Docker image to AWS EC2 instance
                     sh "scp -i ${SSH_KEY} palrag.tar ubuntu@34.201.161.231:~/palrag.tar"
 
                     // SSH into AWS EC2 instance and perform Docker operations
                     sh """
-                        ssh -i ${SSH_KEY} ununtu@34.201.161.231 << 'EOF'
+                        ssh -i ${SSH_KEY} ubuntu@34.201.161.231 << 'EOF'
                             sudo docker stop palrag || true
                             sudo docker rm palrag || true
                             sudo docker load -i ~/palrag.tar
