@@ -25,9 +25,9 @@ stage('Disk Space Enhancment') {
     steps {
         script {
             // Clean up unused Docker resources
-            sh 'sudo docker volume prune -f'
-            sh 'sudo docker image prune -f'
-            sh 'sudo docker container prune -f'
+            sh 'docker volume prune -f'
+            sh 'docker image prune -f'
+            sh 'docker container prune -f'
         }
     }
 }
