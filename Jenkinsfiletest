@@ -16,7 +16,7 @@ pipeline {
             steps {
                 script {
             // Build Docker image with --no-cache flag
-            sh 'docker build -t palrag -f API/Dockerfile --no-cache .'
+            sh 'docker build -t palrag -f API/Dockerfile .'
             
             // Clean up unused Docker resources
             sh 'docker volume prune -f'
