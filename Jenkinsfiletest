@@ -27,16 +27,16 @@ pipeline {
             }
         }
 
-        stage('Disk Space Enhancement') {
-            steps {
-                script {
+       // stage('Disk Space Enhancement') {
+         //   steps {
+           //     script {
                     // Clean up unused Docker resources
                     // sh 'docker volume prune -f'
                     // sh 'docker image prune -f'
                     // sh 'docker container prune -f'
-                }
-            }
-        }
+            //    }
+          //  }
+       // }
 
         stage('Deploy to Remote AWS EC2') {
             steps {
