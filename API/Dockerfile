@@ -1,6 +1,18 @@
 # syntax=docker/dockerfile:1
 
+# Stage 1: Build dependencies
 ARG PYTHON_VERSION=3.10
+FROM python:${PYTHON_VERSION}-slim as builder
+
+WORKDIR /app
+
+COPY API/requirements.txt .
+
+# Create a virtual environment and install dependencies
+RUN python -m venv /venv
+RUN /venv/bin/python -m pip install --no-cache-dir -r requirements.txt
+
+# Stage 2: Final image
 FROM python:${PYTHON_VERSION}-slim as base
 
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -8,8 +20,8 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Create a virtual environment
-RUN python -m venv /venv
+# Copy virtual environment
+COPY --from=builder /venv /venv
 ENV PATH="/venv/bin:$PATH"
 
 ARG UID=10001
@@ -25,10 +37,6 @@ RUN mkdir -p /home/appuser && \
 
 # Change ownership of the /app directory
 RUN chown -R appuser:appuser /app
-
-# Copy and install Python dependencies
-COPY API/requirements.txt .
-RUN /venv/bin/python -m pip install --no-cache-dir -r requirements.txt
 
 USER appuser
 
