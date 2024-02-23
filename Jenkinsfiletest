@@ -15,9 +15,14 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Build Docker image
-                    sh 'docker build -t palrag -f API/Dockerfile .'
-                }
+            // Build Docker image with --no-cache flag
+            sh 'docker build -t palrag -f API/Dockerfile --no-cache .'
+            
+            // Clean up unused Docker resources
+            sh 'docker volume prune -f'
+            sh 'docker image prune -f'
+            sh 'docker container prune -f'
+        }
             }
         }
 
