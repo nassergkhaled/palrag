@@ -5,6 +5,12 @@ pipeline {
         timeout(time: 10, unit: 'MINUTES') // Adjust the timeout as needed
     }
 
+    environment {
+        SSH_KEY = credentials('aws-test-server-ssh-key-id')
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -13,49 +19,43 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-    steps {
-        script {
-            // Build Docker image with --no-cache flag
-            sh 'docker build -t palrag -f API/Dockerfile --no-cache .'
+            steps {
+                script {
+                    // Build Docker image with --no-cache flag
+                    sh 'docker build -t palrag -f API/Dockerfile  .'
+                }
+            }
         }
-    }
-}
 
-stage('Disk Space Enhancment') {
-    steps {
-        script {
-            // Clean up unused Docker resources
-            sh 'docker volume prune -f'
-            sh 'docker image prune -f'
-            sh 'docker container prune -f'
+        stage('Disk Space Enhancement') {
+            steps {
+                script {
+                    // Clean up unused Docker resources
+                    sh 'docker volume prune -f'
+                    sh 'docker image prune -f'
+                    sh 'docker container prune -f'
+                }
+            }
         }
-    }
-}
 
         stage('Deploy to Remote AWS EC2') {
             steps {
-                withCredentials([
-                    sshUserPrivateKey(credentialsId: 'your-ssh-credentials-id', keyFileVariable: 'SSH_KEY', passphraseVariable: 'SSH_PASSPHRASE'),
-                    string(credentialsId: 'your-aws-access-key-id', variable: 'AWS_ACCESS_KEY_ID'),
-                    string(credentialsId: 'your-aws-secret-access-key', variable: 'AWS_SECRET_ACCESS_KEY')
-                ]) {
-                    script {
-                        // Save Docker image to a tar file
-                        sh 'docker save palrag -o palrag.tar'
+                script {
+                    // Save Docker image to a tar file
+                    sh 'docker save palrag -o palrag.tar'
 
-                        // Copy Docker image to AWS EC2 instance
-                        sh 'scp -i ${SSH_KEY} palrag.tar ec2-user@34.201.161.231:~/palrag.tar'
+                    // Copy Docker image to AWS EC2 instance
+                    sh "scp -i ${SSH_KEY} palrag.tar ec2-user@34.201.161.231:~/palrag.tar"
 
-                        // SSH into AWS EC2 instance and perform Docker operations
-                        sh """
-                            ssh -i ${SSH_KEY} ec2-user@34.201.161.231 << 'EOF'
-                                sudo docker stop palrag || true
-                                sudo docker rm palrag || true
-                                sudo docker load -i ~/palrag.tar
-                                sudo docker run -d -p 8081:8081 --name palrag palrag
-                            EOF
-                        """
-                    }
+                    // SSH into AWS EC2 instance and perform Docker operations
+                    sh """
+                        ssh -i ${SSH_KEY} ec2-user@34.201.161.231 << 'EOF'
+                            sudo docker stop palrag || true
+                            sudo docker rm palrag || true
+                            sudo docker load -i ~/palrag.tar
+                            sudo docker run -d -p 8081:8081 --name palrag palrag
+                        EOF
+                    """
                 }
             }
         }
