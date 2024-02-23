@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     options {
-        timeout(time: 20, unit: 'MINUTES') // Adjust the timeout as needed
+        timeout(time: 55, unit: 'MINUTES') // Adjust the timeout as needed
     }
 
     environment {
